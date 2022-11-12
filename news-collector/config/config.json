@@ -1,0 +1,29 @@
+{
+  "app": {
+    "env": "read environment-vars key DEPLOY_ENV",
+    "name": "news-collector-go-svc",
+    "version": "0.0.1"
+  },
+  "collectorSettings": {
+    "sourceOfNews" : "read environment-vars key SOURCE_OF_NEWS",
+    "scrapeInterval" : "read environment-vars key SCRAPE_INTERVAL"
+  },
+  "memphis": {
+    "host": "read environment-vars key MEMPHIS_HOST",
+    "port": -1,
+    "token": "read environment-vars key MEMPHIS_TOKEN",
+    "username": "read environment-vars key MEMPHIS_USERNAME",
+    "newsStation" : "read environment-var keys STATION_NEWS_ID"
+  },
+  "theGuardianConfig": {
+    "apiKey": "read environment-vars key GUARDIAN_API_KEY",
+    "baseUrl": "https:\/\/content.guardianapis.com",
+    "getNewsPath": "search?order-by=newest",
+    "httpMethod": "GET"
+  },
+  "theNewsApiConfig": {
+    "baseUrl": "https:\/\/saurav.tech",
+    "getNewsPath": "NewsAPI\/everything\/cnn.json",
+    "httpMethod": "GET"
+  }
+}

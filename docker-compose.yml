@@ -1,0 +1,68 @@
+services:
+  mongo:
+    image: "memphisos/mongo:4.2"
+    restart: on-failure
+    pull_policy: always
+    networks:
+      - memphis
+  memphis-cluster:
+    image: "memphisos/memphis-broker:latest"
+    restart: on-failure
+    pull_policy: always
+    networks:
+      - memphis
+    ports:
+      - "9000:9000"
+      - "6666:6666"
+    environment:
+      - ROOT_PASSWORD=memphis
+      - CONNECTION_TOKEN=memphis
+      - DOCKER_ENV=true
+      - LOGS_RETENTION_IN_DAYS=3
+      - ANALYTICS=true
+      - JWT_SECRET=35nhvjfosfklgmfg56+fdsgzvfnjksacvbhfksfkgofadsjfgjkoldsdkfvpl’jbgio;dfsjgkl;’XZFVMifobd;dlgjv[sfvjmiodfkvs2fh;fhk44gfdhksdkfdffk
+      - REFRESH_JWT_SECRET=35c7b3eb969db065bfa3c66b38e4323e8f73113f3965dfb55c6bc585dcb0ba62bd399e2588fdc8f709ae0b63fb24be32590f134506ca1d7a4314339f11b8045a
+    command: >
+      -js --auth=memphis
+  news-collector:
+    build:
+      context: ./news-collector
+      dockerfile: Dockerfile
+#    image: "news-collector:0.0.1"
+    restart: on-failure
+    pull_policy: always
+    networks:
+      - memphis
+    ports:
+      - "8080:8080"
+    environment:
+      - DEPLOY_ENV=DEV
+      - APP_CONFIG_PATH=./config/config.json
+      - MEMPHIS_HOST=memphis-cluster
+      - MEMPHIS_USERNAME=root
+      - MEMPHIS_TOKEN=memphis
+      - MEMPHIS_PORT=6666
+      - SOURCE_OF_NEWS=NEWSAPI # e.g THEGUARDIAN, NEWSAPI
+      - SCRAPE_INTERVAL=10s
+      - STATION_NEWS_ID=station-news
+      - GUARDIAN_API_KEY=5bd4bdab-60d8-44ae-8ceb-9d0638c0637c
+  news-presenter:
+    build:
+      context: ./news-presenter
+      dockerfile: Dockerfile
+    #    image: "news-presenter:0.0.1"
+    restart: on-failure
+    pull_policy: always
+    networks:
+      - memphis
+    ports:
+      - "8081:8081"
+    environment:
+      - MEMPHIS_HOST=memphis-cluster
+      - MEMPHIS_USERNAME=root
+      - MEMPHIS_TOKEN=memphis
+      - MEMPHIS_PORT=6666
+networks:
+  memphis:
+    ipam:
+      driver: default

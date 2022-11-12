@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>News Presenter</title>
+</head>
+<body>
+<div id="myData"></div>
+<script>
+    let socket = new WebSocket("ws://127.0.0.1:8081/ws");
+    console.log("Attempting Connection...");
+
+    socket.onopen = () => {
+        console.log("Successfully Connected");
+        socket.send("Hi From the Client!")
+    };
+
+    socket.onclose = event => {
+        console.log("Socket Closed Connection: ", event);
+        socket.send("Client Closed!")
+    };
+
+    socket.onerror = error => {
+        console.log("Socket Error: ", error);
+    };
+
+    socket.onmessage = (msg) => {
+        const data = JSON.parse(msg.data)
+        var mainContainer = document.getElementById("myData");
+        mainContainer.innerText = JSON.stringify(data, "undefined", 4)
+    }
+
+</script>
+</body>
+</html>
