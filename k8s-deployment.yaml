@@ -1,0 +1,101 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: news-system
+---
+apiVersion: /v1
+kind: Service
+metadata:
+  name: news-presenter-go-svc
+  namespace: news-system
+spec:
+  type: ClusterIP
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8081
+  selector:
+    app: news-presenter
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: news-presenter-deploy
+  namespace: news-system
+  labels:
+    app: news-presenter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: news-presenter
+  template:
+    metadata:
+      name: news-presenter
+      labels:
+        app: news-presenter
+    spec:
+      containers:
+        - name: news-presenter
+          image: egasimov/news-system-news-presenter:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8081
+          env:
+            - name: MEMPHIS_HOST
+              value: "memphis-cluster.memphis.svc.cluster.local"
+            - name: MEMPHIS_PORT
+              value: "6666"
+            - name: MEMPHIS_USERNAME
+              value: "root"
+            - name: MEMPHIS_TOKEN
+              value: "QOnYI9EoHRchoclfIjQu"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: news-collector-deploy
+  namespace: news-system
+  labels:
+    app: news-collector
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: news-collector
+  template:
+    metadata:
+      name: news-collector
+      labels:
+        app: news-collector
+    spec:
+      containers:
+        - name: news-collector
+          image: egasimov/news-system-news-collector:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DEPLOY_ENV
+              value: "DEV"
+            - name: APP_CONFIG_PATH
+              value: "./config/config.json"
+            - name: MEMPHIS_HOST
+              value: "memphis-cluster.memphis.svc.cluster.local"
+            - name: MEMPHIS_PORT
+              value: "6666"
+            - name: MEMPHIS_USERNAME
+              value: "root"
+            - name: MEMPHIS_TOKEN
+              value: "QOnYI9EoHRchoclfIjQu"
+            - name: SOURCE_OF_NEWS
+              value: "NEWSAPI"
+            - name: SCRAPE_INTERVAL
+              value: "10s"
+            - name: STATION_NEWS_ID
+              value: "station-news"
+            - name: GUARDIAN_API_KEY
+              value: "5bd4bdab-60d8-44ae-8ceb-9d0638c0637c"
+---

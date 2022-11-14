@@ -20,7 +20,7 @@ behaviour or change config kinda values(_scrape interval, switching source of ne
 
 Please refer to environment variables(e.g [news-collector environment variables](./news-collector/.env.local)) and configuration files(e.g [news-collector config file](./news-collector/config/config.json)).
 
-## _Testing_
+## _Testing on Docker_
 
 1. First clone the application into your machine
 
@@ -41,6 +41,48 @@ Please refer to environment variables(e.g [news-collector environment variables]
 ![alt text](./doc/output-docker-ps.png)
 
 5. Open [simple file](./news-presenter/client-index.html) in the browser, and verify it is working
+
+``open ./news-presenter/client-index.html``
+
+
+## _Testing on K8s_
+1. First clone the application into your machine
+
+``git clone https://github.com/egasimov/news-system.git``
+
+2. Make sure that kubernetes already configured and running, kubectl properly configured with k8s
+
+``kubectl cluster-info``
+
+4. Make sure that memphis already configured and running properly
+
+``helm repo add memphis https://k8s.memphis.dev/charts/ --force-update && helm install memphis memphis/memphis --create-namespace --namespace memphis``
+
+Memphis Deployment Information
+### Secrets ###
+UI/CLI/SDK root username        - root
+
+UI/CLI root Password            - kubectl get secret memphis-creds -n memphis -o jsonpath="{.data.ROOT_PASSWORD}" | base64 --decode
+
+SDK root connection token       - kubectl get secret memphis-creds -n memphis -o jsonpath="{.data.CONNECTION_TOKEN}" | base64 --decode
+
+Replace MEMPHIS_TOKEN(in [k8s-deployment.yml](./k8s-deployment.yaml)) with value from SDK root connection token.
+
+5.Use and apply below deployment file 
+
+``kubectl apply -f k8s-deployment.yaml``
+
+6.Verify pods are properly running on machine.
+
+``docker ps``
+
+![alt text](./doc/output-docker-ps.png)
+
+7. Do port forwarding from k8s to your local machine to test it.
+
+``kubectl port-forward service/news-presenter-go-svc 8081:80 --namespace news-system``
+
+8. Open [simple file](./news-presenter/client-index.html) in the browser, and verify it is working
 
 ``open ./news-presenter/client-index.html``
 
