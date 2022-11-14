@@ -74,9 +74,9 @@ Replace MEMPHIS_TOKEN(in [k8s-deployment.yml](./k8s-deployment.yaml)) with value
 
 6.Verify pods are properly running on machine.
 
-``docker ps``
+``kubectl get pods --namespace news-system``
 
-![alt text](./doc/output-docker-ps.png)
+![alt text](./doc/output-k8s-get-pods.png)
 
 7. Do port forwarding from k8s to your local machine to test it.
 
